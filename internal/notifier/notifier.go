@@ -129,7 +129,7 @@ func (n *Notifier) send(ctx context.Context, e watchlist.Entry, ac adsbx.Aircraf
 	if err != nil {
 		return fmt.Errorf("post: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode >= 300 {
 		b, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		return fmt.Errorf("status %d: %s", resp.StatusCode, strings.TrimSpace(string(b)))

@@ -61,7 +61,7 @@ func (s *SBSStreamer) streamOnce(ctx context.Context, out chan<- Aircraft) error
 	if err != nil {
 		return fmt.Errorf("dial: %w", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	go func() {
 		<-ctx.Done()

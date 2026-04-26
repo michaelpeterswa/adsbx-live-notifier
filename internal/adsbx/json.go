@@ -76,7 +76,7 @@ func (p *JSONPoller) pollOnce(ctx context.Context, out chan<- Aircraft) error {
 	if err != nil {
 		return fmt.Errorf("fetch: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		_, _ = io.Copy(io.Discard, resp.Body)
 		return fmt.Errorf("unexpected status %d", resp.StatusCode)
