@@ -4,6 +4,8 @@ services:
     build: .
     ports:
       - "8081:8081"
+    volumes:
+      - ./watchlist.json:/etc/adsbx/watchlist.json:ro
     environment:
       # logging
       LOG_LEVEL: "info"
@@ -17,13 +19,27 @@ services:
       # tracing
       TRACING_ENABLED: "false"
       TRACING_SAMPLERATE: "1.0"
-      TRACING_SERVICE: "go-start"
+      TRACING_SERVICE: "adsbx-live-notifier"
       TRACING_VERSION: "0.0.1"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://lgtm:4317"
 
       # grpc (otlp tracing)
       GRPC_GO_LOG_VERBOSITY_LEVEL: 99
       GRPC_GO_LOG_SEVERITY_LEVEL: info
+
+      # adsbexchange feeder
+      ADSBX_HOST: "adsbexchange.local"
+      ADSBX_POLL_INTERVAL: "1s"
+      ADSBX_JSON_ENABLED: "true"
+      ADSBX_SBS_ENABLED: "true"
+
+      # watchlist & notifier
+      WATCHLIST_PATH: "/etc/adsbx/watchlist.json"
+      WATCHLIST_COOLDOWN: "10m"
+      PULSAR_URL: "http://pulsar.local:8080"
+      PULSAR_BEARER_TOKEN: "replace-me"
+      PULSAR_PUSHOVER_USER_KEY: "replace-me"
+      PULSAR_PRIORITY: "0"
 
   lgtm:
     image: grafana/otel-lgtm

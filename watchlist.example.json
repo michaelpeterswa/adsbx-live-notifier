@@ -1,0 +1,12 @@
+{
+  "aircraft": [
+    {
+      "tail": "N12345",
+      "description": "Friend's Cessna 172"
+    },
+    {
+      "hex": "a1b2c3",
+      "description": "Notable airframe"
+    }
+  ]
+}
