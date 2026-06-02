@@ -19,6 +19,7 @@ import (
 
 	"github.com/michaelpeterswa/adsbx-live-notifier/internal/adsbx"
 	"github.com/michaelpeterswa/adsbx-live-notifier/internal/config"
+	"github.com/michaelpeterswa/adsbx-live-notifier/internal/enrich"
 	"github.com/michaelpeterswa/adsbx-live-notifier/internal/logging"
 	appmetrics "github.com/michaelpeterswa/adsbx-live-notifier/internal/metrics"
 	"github.com/michaelpeterswa/adsbx-live-notifier/internal/notifier"
@@ -125,12 +126,22 @@ func main() {
 			slog.Error("could not create watchlist", slog.String("error", err.Error()))
 			os.Exit(1)
 		}
+		var enricher notifier.Enricher
+		if c.MetadataEnabled {
+			ec, err := enrich.New(c.HexDBURL)
+			if err != nil {
+				slog.Error("could not create metadata enricher", slog.String("error", err.Error()))
+				os.Exit(1)
+			}
+			enricher = ec
+			slog.Info("metadata enrichment enabled", slog.String("hexdb_url", c.HexDBURL))
+		}
 		ntfr = notifier.New(notifier.Config{
 			URL:             c.PulsarURL,
 			BearerToken:     c.PulsarBearerToken,
 			PushoverUserKey: c.PulsarPushoverUserKey,
 			Priority:        c.PulsarPriority,
-		})
+		}, enricher)
 		slog.Info("watchlist loaded",
 			slog.Int("entries", wl.Len()),
 			slog.Duration("cooldown", c.WatchlistCooldown),
