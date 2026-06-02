@@ -82,7 +82,9 @@ func New(entries []Entry, cooldown time.Duration) (*Watchlist, error) {
 func (w *Watchlist) Len() int { return len(w.entries) }
 
 // Match returns the first matching entry. fire is true when the cooldown has
-// lapsed for that entry and the caller should send an alert.
+// lapsed for that entry and the caller should send an alert. The cooldown is
+// tracked per source so the SBS and JSON feeds each alert independently (SBS
+// typically fires first as a bare detection, JSON follows with full data).
 func (w *Watchlist) Match(ac adsbx.Aircraft) (entry Entry, matched, fire bool) {
 	flight := strings.ToUpper(strings.TrimSpace(ac.Flight))
 	hex := strings.ToLower(strings.TrimSpace(ac.Hex))
@@ -91,7 +93,7 @@ func (w *Watchlist) Match(ac adsbx.Aircraft) (entry Entry, matched, fire bool) {
 		if !hit {
 			continue
 		}
-		key := e.Label()
+		key := e.Label() + "|" + string(ac.Source)
 		if _, present := w.cache.Get(key); present {
 			return e, true, false
 		}

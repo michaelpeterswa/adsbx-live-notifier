@@ -107,3 +107,23 @@ func TestMatchCooldown(t *testing.T) {
 		t.Fatal("second match within cooldown should not fire")
 	}
 }
+
+func TestMatchCooldownPerSource(t *testing.T) {
+	w, err := New([]Entry{{Hex: "abc123"}}, time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// SBS fires first as a bare detection.
+	if _, _, fire := w.Match(adsbx.Aircraft{Hex: "abc123", Source: adsbx.SourceSBS}); !fire {
+		t.Fatal("first SBS match should fire")
+	}
+	// JSON has its own cooldown, so it fires even within the SBS window.
+	if _, _, fire := w.Match(adsbx.Aircraft{Hex: "abc123", Source: adsbx.SourceJSON}); !fire {
+		t.Fatal("JSON match should fire independently of SBS")
+	}
+	// A second SBS sighting within the window is still suppressed.
+	time.Sleep(50 * time.Millisecond)
+	if _, _, fire := w.Match(adsbx.Aircraft{Hex: "abc123", Source: adsbx.SourceSBS}); fire {
+		t.Fatal("second SBS match within cooldown should not fire")
+	}
+}

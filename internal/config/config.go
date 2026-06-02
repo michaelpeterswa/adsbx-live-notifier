@@ -30,6 +30,9 @@ type Config struct {
 	WatchlistPath     string        `env:"WATCHLIST_PATH"`
 	WatchlistCooldown time.Duration `env:"WATCHLIST_COOLDOWN" envDefault:"10m"`
 
+	MetadataEnabled bool   `env:"METADATA_ENABLED" envDefault:"true"`
+	HexDBURL        string `env:"HEXDB_URL" envDefault:"https://hexdb.io"`
+
 	PulsarURL             string `env:"PULSAR_URL"`
 	PulsarBearerToken     string `env:"PULSAR_BEARER_TOKEN"`
 	PulsarPushoverUserKey string `env:"PULSAR_PUSHOVER_USER_KEY"`
